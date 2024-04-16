@@ -3,4 +3,5 @@
 export(dmakedist)
 export(initialize_api)
 export(pmakedist)
+export(qmakedist)
 export(query_distribution)

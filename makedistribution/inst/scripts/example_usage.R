@@ -1,5 +1,3 @@
-# example_usage.R
-
 # Load the package
 library(makedistribution)
 
@@ -26,7 +24,7 @@ arguments <- list(
   )
 )
 
-# Points at which to evaluate the density
+# Points at which to evaluate the PDF or CDF
 x_values <- seq(-3, 3, by = 0.5)
 
 # Get densities
@@ -34,6 +32,16 @@ densities <- dmakedist(api_settings, distribution_family, arguments, x_values)
 print("densities:")
 print(densities)
 
+# Get probabilities
 probabilities <- pmakedist(api_settings, distribution_family, arguments, x_values)
 print("probabilities:")
 print(probabilities)
+
+# Get quantiles
+p_values <- seq(0.1, 0.9, by = 0.2)  # Points at which to evaluate the quantile function
+quantiles <- qmakedist(api_settings, distribution_family, arguments, p_values)
+print("x-values:")
+print(quantiles)
+
+
+

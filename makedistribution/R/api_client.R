@@ -43,17 +43,16 @@ make_post_request <- function(api_settings, endpoint, body) {
   httr::content(response, "parsed")
 }
 
-
 #' Create and query a distribution
 #'
 #' @param api_settings List containing API settings
 #' @param family A string representing the requested distribution family
 #' @param arguments A list containing the arguments specific to the distribution
-#' @param x Vector of points at which to evaluate the function
-#' @param endpoint_suffix A string indicating whether to use the 'pdf' or 'cdf' endpoint
-#' @return Vector of function values at points x
+#' @param values Vector of x values for PDF/CDF or probabilities for QF
+#' @param endpoint_suffix A string indicating whether to use the 'pdf', 'cdf', or 'qf' endpoint
+#' @return Vector of function values at points x or probabilities p
 #' @export
-query_distribution <- function(api_settings, family, arguments, x, endpoint_suffix) {
+query_distribution <- function(api_settings, family, arguments, values, endpoint_suffix) {
   # Format the body for the POST request
   body <- list(
     family = list(requested = family),
@@ -64,18 +63,21 @@ query_distribution <- function(api_settings, family, arguments, x, endpoint_suff
   create_response <- make_post_request(api_settings, "/1d/dists/", body)
   dist_id <- create_response$id
   
-  # Format the query parameter for x values
-  x_query <- paste(x, collapse = ",")
-  endpoint <- sprintf("/1d/dists/%s/%s/?x=%s", dist_id, endpoint_suffix, x_query)
+  # Format the query parameter for x values or probabilities
+  value_query <- paste(values, collapse = ",")
+  endpoint <- sprintf("/1d/dists/%s/%s/?%s=%s", dist_id, endpoint_suffix,
+                      if (endpoint_suffix == "qf") "p" else "x", value_query)
   
   # Make the GET request to query the function
   response <- make_get_request(api_settings, endpoint)
   
-  # Extract the values in the same order as x
+  # Extract the values in the same order as the input
   if (endpoint_suffix == "pdf") {
     values <- vapply(response, function(item) item$density, numeric(1))
   } else if (endpoint_suffix == "cdf") {
     values <- vapply(response, function(item) item$p, numeric(1))
+  } else if (endpoint_suffix == "qf") {
+    values <- vapply(response, function(item) item$x, numeric(1))
   }
   
   values
@@ -103,6 +105,18 @@ dmakedist <- function(api_settings, family, arguments, x) {
 #' @export
 pmakedist <- function(api_settings, family, arguments, x) {
   query_distribution(api_settings, family, arguments, x, "cdf")
+}
+
+#' Query the quantile function of a distribution
+#'
+#' @param api_settings List containing API settings
+#' @param family A string representing the requested distribution family
+#' @param arguments A list containing the arguments specific to the distribution
+#' @param p Vector of probabilities at which to evaluate the quantile function
+#' @return Vector of quantile values
+#' @export
+qmakedist <- function(api_settings, family, arguments, p) {
+  query_distribution(api_settings, family, arguments, p, "qf")
 }
 
 

@@ -1,5 +1,6 @@
 Package: makedistribution
 Title: Client For MakeDistribution API
+URL: https://github.com/tadamcz/make_distribution_r_client
 Version: 0.0.0.9000
 Authors@R: 
     person("Tom", "Adamczewski", , "tadamczewskipublic@gmail.com", role = c("aut", "cre"))

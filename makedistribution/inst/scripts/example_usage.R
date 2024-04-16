@@ -31,4 +31,9 @@ x_values <- seq(-3, 3, by = 0.5)
 
 # Get densities
 densities <- dmakedist(api_settings, distribution_family, arguments, x_values)
+print("densities:")
 print(densities)
+
+probabilities <- pmakedist(api_settings, distribution_family, arguments, x_values)
+print("probabilities:")
+print(probabilities)

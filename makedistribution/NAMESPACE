@@ -2,3 +2,4 @@
 
 export(dmakedist)
 export(initialize_api)
+export(pmakedist)

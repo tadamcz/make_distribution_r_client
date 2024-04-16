@@ -76,4 +76,35 @@ dmakedist <- function(api_settings, family, arguments, x) {
   densities
 }
 
+#' Query the cumulative distribution function of a distribution
+#'
+#' @param api_settings List containing API settings
+#' @param family A string representing the requested distribution family
+#' @param arguments A list containing the arguments specific to the distribution
+#' @param x Vector of points at which to evaluate the CDF
+#' @return Vector of CDF values at points x
+#' @export
+pmakedist <- function(api_settings, family, arguments, x) {
+  # Format the body for the POST request
+  body <- list(
+    family = list(requested = family),
+    arguments = arguments
+  )
+  
+  # Create the distribution
+  create_response <- make_post_request(api_settings, "/1d/dists/", body)
+  dist_id <- create_response$id
+  
+  # Format the query parameter for x values
+  x_query <- paste(x, collapse = ",")
+  endpoint <- sprintf("/1d/dists/%s/cdf/?x=%s", dist_id, x_query)
+  
+  # Make the GET request to query the CDF
+  cdf_response <- make_get_request(api_settings, endpoint)
+  
+  # Extracting the CDF values in the same order as x
+  cdf_values <- vapply(cdf_response, function(item) item$p, numeric(1))
+  
+  cdf_values
+}
 

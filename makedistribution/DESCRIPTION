@@ -1,12 +1,16 @@
 Package: makedistribution
-Title: What the Package Does (One Line, Title Case)
+Title: R client for the MakeDistribution API
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Tom", "Adamczewski", , "tadamczewskipublic@gmail.com", role = c("aut", "cre"))
+Author: Tom Adamczewski [aut, cre]
+Maintainer: Tom Adamczewski <tadamczewskipublic@gmail.com>
+Description: R client for the HTTP API of MakeDistribution.com. MakeDistribution is for creating probability distributions from human judgment. It offers continuous distributions that can flexibly match your beliefs, unlike traditional ones.
+Depends:
+    R (>= 3.5.0)
+Imports:
+    httr,
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1

@@ -43,16 +43,64 @@ make_post_request <- function(api_settings, endpoint, body) {
   httr::content(response, "parsed")
 }
 
-#' Create and query a distribution
+#' Query the density of a distribution
 #'
+#' @param x Vector of points at which to evaluate the density
 #' @param api_settings List containing API settings
 #' @param family A string representing the requested distribution family
 #' @param arguments A list containing the arguments specific to the distribution
+#' @return Vector of density values
+#' @export
+dmakedist <- function(x, api_settings, family, arguments) {
+  query_distribution(x, api_settings, family, arguments, "pdf")
+}
+
+#' Query the cumulative distribution function of a distribution
+#'
+#' @param x Vector of points at which to evaluate the CDF
+#' @param api_settings List containing API settings
+#' @param family A string representing the requested distribution family
+#' @param arguments A list containing the arguments specific to the distribution
+#' @return Vector of CDF values
+#' @export
+pmakedist <- function(x, api_settings, family, arguments) {
+  query_distribution(x, api_settings, family, arguments, "cdf")
+}
+
+#' Query the quantile function of a distribution
+#'
+#' @param p Vector of probabilities at which to evaluate the quantile function
+#' @param api_settings List containing API settings
+#' @param family A string representing the requested distribution family
+#' @param arguments A list containing the arguments specific to the distribution
+#' @return Vector of quantile values
+#' @export
+qmakedist <- function(p, api_settings, family, arguments) {
+  query_distribution(p, api_settings, family, arguments, "qf")
+}
+
+#' Query random samples from a distribution
+#'
+#' @param size Integer specifying the number of samples to retrieve
+#' @param api_settings List containing API settings
+#' @param family A string representing the requested distribution family
+#' @param arguments A list containing the arguments specific to the distribution
+#' @return Vector of random samples
+#' @export
+rmakedist <- function(size, api_settings, family, arguments) {
+  query_distribution(size, api_settings, family, arguments, "samples")
+}
+
+#' Create and query a distribution
+#'
 #' @param value Single value specifying the size for samples or vector of x values or probabilities
+#' @param api_settings List containing API settings
+#' @param family A string representing the requested distribution family
+#' @param arguments A list containing the arguments specific to the distribution
 #' @param endpoint_suffix A string indicating the specific endpoint ('pdf', 'cdf', 'qf', or 'samples')
 #' @return Vector of function values or random samples
 #' @export
-query_distribution <- function(api_settings, family, arguments, value, endpoint_suffix) {
+query_distribution <- function(value, api_settings, family, arguments, endpoint_suffix) {
   # Format the body for the POST request
   body <- list(
     family = list(requested = family),
@@ -87,53 +135,4 @@ query_distribution <- function(api_settings, family, arguments, value, endpoint_
   }
   
   values
-}
-
-#' Query the density of a distribution
-#'
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @param x Vector of points at which to evaluate the density
-#' @return Vector of density values
-#' @export
-dmakedist <- function(api_settings, family, arguments, x) {
-  query_distribution(api_settings, family, arguments, x, "pdf")
-}
-
-#' Query the cumulative distribution function of a distribution
-#'
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @param x Vector of points at which to evaluate the CDF
-#' @return Vector of CDF values at points x
-#' @export
-pmakedist <- function(api_settings, family, arguments, x) {
-  query_distribution(api_settings, family, arguments, x, "cdf")
-}
-
-#' Query the quantile function of a distribution
-#'
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @param p Vector of probabilities at which to evaluate the quantile function
-#' @return Vector of quantile values
-#' @export
-qmakedist <- function(api_settings, family, arguments, p) {
-  query_distribution(api_settings, family, arguments, p, "qf")
-}
-
-
-#' Query random samples from a distribution
-#'
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @param size Integer specifying the number of samples to retrieve
-#' @return Vector of random samples
-#' @export
-rmakedist <- function(api_settings, family, arguments, size) {
-  query_distribution(api_settings, family, arguments, size, "samples")
 }

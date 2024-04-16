@@ -28,25 +28,23 @@ arguments <- list(
 x_values <- seq(-3, 3, by = 0.5)
 
 # Get densities
-densities <- dmakedist(api_settings, distribution_family, arguments, x_values)
+densities <- dmakedist(x_values, api_settings, distribution_family, arguments)
 print("densities:")
 print(densities)
 
 # Get probabilities
-probabilities <- pmakedist(api_settings, distribution_family, arguments, x_values)
+probabilities <- pmakedist(x_values, api_settings, distribution_family, arguments)
 print("probabilities:")
 print(probabilities)
 
 # Get quantiles
 p_values <- seq(0.1, 0.9, by = 0.2)  # Points at which to evaluate the quantile function
-quantiles <- qmakedist(api_settings, distribution_family, arguments, p_values)
+quantiles <- qmakedist(p_values, api_settings, distribution_family, arguments)
 print("x-values:")
 print(quantiles)
 
 # Generate random variates
 sample_size <- 16
-samples <- rmakedist(api_settings, distribution_family, arguments, sample_size)
+samples <- rmakedist(sample_size, api_settings, distribution_family, arguments)
 print("samples:")
 print(samples)
-
-

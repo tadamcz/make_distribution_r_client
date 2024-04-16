@@ -43,5 +43,10 @@ quantiles <- qmakedist(api_settings, distribution_family, arguments, p_values)
 print("x-values:")
 print(quantiles)
 
+# Generate random variates
+sample_size <- 16
+samples <- rmakedist(api_settings, distribution_family, arguments, sample_size)
+print("samples:")
+print(samples)
 
 

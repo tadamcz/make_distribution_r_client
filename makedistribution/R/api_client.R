@@ -19,7 +19,10 @@ initialize_api <- function(token, version = "v0") {
 make_get_request <- function(api_settings, endpoint) {
   url <- paste0(api_settings$base_url, endpoint)
   response <- httr::GET(url, httr::add_headers(Authorization = paste0("Token ", api_settings$token)))
-  httr::stop_for_status(response)
+  if (httr::http_error(response)) {
+    message("Error in GET request: ", httr::content(response, "text"))
+    httr::stop_for_status(response)
+  }
   httr::content(response, "parsed")
 }
 
@@ -33,9 +36,13 @@ make_get_request <- function(api_settings, endpoint) {
 make_post_request <- function(api_settings, endpoint, body) {
   url <- paste0(api_settings$base_url, endpoint)
   response <- httr::POST(url, httr::add_headers(Authorization = paste0("Token ", api_settings$token)), body = body, encode = "json")
-  httr::stop_for_status(response)
+  if (httr::http_error(response)) {
+    message("Error in POST request: ", httr::content(response, "text"))
+    httr::stop_for_status(response)
+  }
   httr::content(response, "parsed")
 }
+
 
 #' Query the density of a distribution
 #'
@@ -54,7 +61,7 @@ dmakedist <- function(api_settings, family, arguments, x) {
   
   # Create the distribution
   create_response <- make_post_request(api_settings, "/1d/dists/", body)
-  dist_id <- create_response$id  # Assuming the response contains an ID
+  dist_id <- create_response$id
   
   # Format the query parameter for x values
   x_query <- paste(x, collapse = ",")

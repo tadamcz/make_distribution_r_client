@@ -20,7 +20,7 @@ distribution_family <- "cinterp5_01"
 # General arguments for the distribution
 arguments <- list(
   quantiles = list(
-    list(p = 0.1, x = 2),
+    list(p = 0.1, x = 0),
     list(p = 0.5, x = 1),
     list(p = 0.9, x = 4)
   )

@@ -2,11 +2,11 @@
 library(makedistribution)
 
 # Retrieve the API token from an environment variable
-api_token <- Sys.getenv("API_TOKEN")
+api_token <- Sys.getenv("MAKEDISTRIBUTION_API_TOKEN")
 
 # Check if the token is available
 if (api_token == "") {
-  stop("API token is not set in environment variables.")
+  stop("API token not found. Please set the MAKEDISTRIBUTION_API_TOKEN environment variable.")
 }
 
 # Initialize API settings using the API token

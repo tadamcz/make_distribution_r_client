@@ -9,6 +9,7 @@ build:
 	R CMD build --no-resave-data .
 
 check:
+	R CMD build --no-resave-data .
 	R CMD check --as-cran $(PACKAGE_NAME)_*.tar.gz
 
 install:

@@ -1,5 +1,5 @@
 Package: makedistribution
-Title: R client for the MakeDistribution API
+Title: Client For MakeDistribution API
 Version: 0.0.0.9000
 Authors@R: 
     person("Tom", "Adamczewski", , "tadamczewskipublic@gmail.com", role = c("aut", "cre"))

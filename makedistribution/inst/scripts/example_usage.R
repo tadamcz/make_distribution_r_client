@@ -14,6 +14,21 @@ if (api_token == "") {
 # Initialize API settings using the API token
 api_settings <- initialize_api(api_token)
 
-# Print the initialized settings to show what they look like
-print(api_settings)
+# Specify the distribution family
+distribution_family <- "cinterp5_01"
 
+# General arguments for the distribution
+arguments <- list(
+  quantiles = list(
+    list(p = 0.1, x = 2),
+    list(p = 0.5, x = 1),
+    list(p = 0.9, x = 4)
+  )
+)
+
+# Points at which to evaluate the density
+x_values <- seq(-3, 3, by = 0.5)
+
+# Get densities
+densities <- dmakedist(api_settings, distribution_family, arguments, x_values)
+print(densities)

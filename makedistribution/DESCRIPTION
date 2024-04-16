@@ -3,8 +3,8 @@ Title: Client For MakeDistribution API
 URL: https://github.com/tadamcz/make_distribution_r_client
 Version: 0.0.0.9000
 Authors@R: 
-    person("Tom", "Adamczewski", , "tadamczewskipublic@gmail.com", role = c("aut", "cre"))
-Author: Tom Adamczewski [aut, cre]
+    person("Tom", "Adamczewski", , "tadamczewskipublic@gmail.com", role = c("aut", "cre", "cph"))
+Author: Tom Adamczewski [aut, cre, cph]
 Maintainer: Tom Adamczewski <tadamczewskipublic@gmail.com>
 Description: R client for the HTTP API of MakeDistribution.com. MakeDistribution is for creating probability distributions from human judgment. It offers continuous distributions that can flexibly match your beliefs, unlike traditional ones.
 Depends:

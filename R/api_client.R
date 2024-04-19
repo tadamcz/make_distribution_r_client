@@ -94,6 +94,10 @@ validate_arguments <- function(path, family, arguments) {
 #' @return Parsed JSON response containing the distribution details.
 #' @export
 get_distribution <- function(path, api_settings = NULL) {
+
+  # Ensure exactly one leading and trailing slash
+  path <- gsub("^/|/$", "", path)
+  path <- paste0("/", path, "/")
   make_get_request(api_settings, path)
 }
 
@@ -112,13 +116,16 @@ construct_endpoint <- function(path, endpoint_suffix, value) {
                         "samples" = "size",
                         stop("Invalid endpoint_suffix provided"))
   
+  # Strip leading and trailing slashes from the path
+  path <- gsub("^/|/$", "", path)
+  
   # Construct the endpoint URL with the appropriate query string
   if (endpoint_suffix == "samples") {
     # For samples, value represents the size directly, no need to collapse
-    sprintf("%s/%s/?%s=%d", path, endpoint_suffix, query_param, value)
+    sprintf("/%s/%s/?%s=%d", path, endpoint_suffix, query_param, value)
   } else {
     # For other types, value is a vector that needs to be collapsed into a comma-separated string
-    sprintf("%s/%s/?%s=%s", path, endpoint_suffix, query_param, paste(value, collapse = ","))
+    sprintf("/%s/%s/?%s=%s", path, endpoint_suffix, query_param, paste(value, collapse = ","))
   }
 }
 

@@ -11,6 +11,9 @@ initialize_api <- function(token = NULL, version = "v0") {
   # If token is null, try to read it from the default environment variable
   if (is.null(token)) {
     token <- Sys.getenv("MAKEDISTRIBUTION_API_TOKEN")
+    if (token == "") {
+      logger::log_debug("Token not provided, and MAKEDISTRIBUTION_API_TOKEN environment variable is not set. API requests will be made without authorization.")
+    }
   }
   # Coerce empty strings returned by Sys.getenv to NULL
   if (token == "") {
@@ -32,8 +35,8 @@ make_get_request <- function(api_settings = NULL, endpoint) {
     api_settings <- initialize_api()
   }
   url <- paste0(api_settings$base_url, endpoint)
-  message("GET request to: ", url)
   headers <- if (!is.null(api_settings$token)) httr::add_headers(Authorization = paste0("Token ", api_settings$token)) else list()
+  logger::log_debug("GET request to ", url, " with headers: ", headers)
   response <- httr::GET(url, headers)
   if (httr::http_error(response)) {
     message("Error in GET request: ", httr::content(response, "text"))
@@ -55,8 +58,8 @@ make_post_request <- function(api_settings, endpoint, body) {
     api_settings <- initialize_api()
   }
   url <- paste0(api_settings$base_url, endpoint)
-  message("POST request to: ", url)
   headers <- if (!is.null(api_settings$token)) httr::add_headers(Authorization = paste0("Token ", api_settings$token)) else list()
+  logger::log_debug("POST request to ", url, " with headers: ", headers, " and body: ", body)
   response <- httr::POST(url, headers, body = body, encode = "json")
   if (httr::http_error(response)) {
     message("Error in POST request: ", httr::content(response, "text"))

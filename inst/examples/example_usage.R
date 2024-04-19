@@ -23,35 +23,35 @@ x_values <- seq(-3, 3, by = 0.5)
 
 # Get densities
 densities <- dmakedist(x_values, distribution_family, arguments)
-print("densities:")
+cat("densities:\n")
 print(densities)
 
 # Get probabilities
 probabilities <- pmakedist(x_values, distribution_family, arguments)
-print("probabilities:")
+cat("probabilities:\n")
 print(probabilities)
 
 # Get quantiles
 p_values <- seq(0.1, 0.9, by = 0.2)  # Points at which to evaluate the quantile function
 quantiles <- qmakedist(p_values, distribution_family, arguments)
-print("x-values:")
+cat("quantiles:\n")
 print(quantiles)
 
 # Generate random variates
 sample_size <- 16
 samples <- rmakedist(sample_size, distribution_family, arguments)
-print("samples:")
+cat("samples:\n")
 print(samples)
 
 # Or, query an existing distribution object
 # by passing `path` instead of `family` and `arguments
 distribution_path <- "/1d/dists/odist_2UjledFsyZHE608XAeKYkw"
 densities <- dmakedist(x_values, path = distribution_path)
-print("densities:")
+cat("densities:\n")
 print(densities)
 
 # Get basic information about the distribution
 # e.g. fit status
 distribution_info <- get_distribution(distribution_path)
-print("distribution_info:")
+cat("distribution_info:\n")
 print(distribution_info)

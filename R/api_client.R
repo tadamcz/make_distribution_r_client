@@ -1,24 +1,26 @@
 #' Initialize API settings
 #'
-#' This function initializes the API configuration and settings.
-#' @param token Your API token as a string.
+#' This function initializes the API configuration and settings. If a token is provided, 
+#' it will be included in all API requests for authorization.
+#' @param token Your API token as a string (optional).
 #' @param version API version, default is "v0".
 #' @return A list containing API settings.
-#' @export
-initialize_api <- function(token, version = "v0") {
+initialize_api <- function(token = NULL, version = "v0") {
   base_url <- sprintf("https://makedistribution.com/s/api/%s", version)
   list(base_url = base_url, token = token)
 }
 
 #' Make an HTTP GET request
 #'
+#' This function performs an HTTP GET request to a specified endpoint. If a token is provided in the API settings,
+#' it will include an Authorization header.
 #' @param api_settings List containing base URL and token
 #' @param endpoint API endpoint for the GET request
 #' @return Parsed JSON response
-#'
 make_get_request <- function(api_settings, endpoint) {
   url <- paste0(api_settings$base_url, endpoint)
-  response <- httr::GET(url, httr::add_headers(Authorization = paste0("Token ", api_settings$token)))
+  headers <- if (!is.null(api_settings$token)) httr::add_headers(Authorization = paste0("Token ", api_settings$token)) else list()
+  response <- httr::GET(url, headers)
   if (httr::http_error(response)) {
     message("Error in GET request: ", httr::content(response, "text"))
     httr::stop_for_status(response)
@@ -28,20 +30,23 @@ make_get_request <- function(api_settings, endpoint) {
 
 #' Make an HTTP POST request
 #'
+#' This function performs an HTTP POST request to a specified endpoint with the given body. 
+#' If a token is provided in the API settings, it will include an Authorization header.
 #' @param api_settings List containing base URL and token
 #' @param endpoint API endpoint for the POST request
 #' @param body A list containing the body of the POST request
 #' @return Parsed JSON response
-#'
 make_post_request <- function(api_settings, endpoint, body) {
   url <- paste0(api_settings$base_url, endpoint)
-  response <- httr::POST(url, httr::add_headers(Authorization = paste0("Token ", api_settings$token)), body = body, encode = "json")
+  headers <- if (!is.null(api_settings$token)) httr::add_headers(Authorization = paste0("Token ", api_settings$token)) else list()
+  response <- httr::POST(url, headers, body = body, encode = "json")
   if (httr::http_error(response)) {
     message("Error in POST request: ", httr::content(response, "text"))
     httr::stop_for_status(response)
   }
   httr::content(response, "parsed")
 }
+
 
 #' Validate the input arguments
 #'

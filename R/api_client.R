@@ -43,96 +43,158 @@ make_post_request <- function(api_settings, endpoint, body) {
   httr::content(response, "parsed")
 }
 
-#' Query the density of a distribution
+#' Validate the input arguments
 #'
-#' @param x Vector of points at which to evaluate the density
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @return Vector of density values
-#' @export
-dmakedist <- function(x, api_settings, family, arguments) {
-  query_distribution(x, api_settings, family, arguments, "pdf")
+#' This function ensures that the correct set of arguments is provided.
+#' @param slug The URL slug for an existing distribution.
+#' @param family The distribution family.
+#' @param arguments The distribution arguments.
+#' @return TRUE if validation passes, otherwise stops with an error message.
+validate_arguments <- function(slug, family, arguments) {
+  if (!is.null(slug) && (!is.null(family) || !is.null(arguments))) {
+    stop("Provide either a slug or both family and arguments, but not both.")
+  }
+  if (is.null(slug) && (is.null(family) || is.null(arguments))) {
+    stop("Both family and arguments must be provided if slug is not.")
+  }
+  TRUE
 }
 
-#' Query the cumulative distribution function of a distribution
+#' Construct the endpoint for the distribution function query
 #'
-#' @param x Vector of points at which to evaluate the CDF
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @return Vector of CDF values
-#' @export
-pmakedist <- function(x, api_settings, family, arguments) {
-  query_distribution(x, api_settings, family, arguments, "cdf")
-}
-
-#' Query the quantile function of a distribution
-#'
-#' @param p Vector of probabilities at which to evaluate the quantile function
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @return Vector of quantile values
-#' @export
-qmakedist <- function(p, api_settings, family, arguments) {
-  query_distribution(p, api_settings, family, arguments, "qf")
-}
-
-#' Query random samples from a distribution
-#'
-#' @param size Integer specifying the number of samples to retrieve
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @return Vector of random samples
-#' @export
-rmakedist <- function(size, api_settings, family, arguments) {
-  query_distribution(size, api_settings, family, arguments, "samples")
-}
-
-#' Create and query a distribution
-#'
-#' @param value Single value specifying the size for samples or vector of x values or probabilities
-#' @param api_settings List containing API settings
-#' @param family A string representing the requested distribution family
-#' @param arguments A list containing the arguments specific to the distribution
-#' @param endpoint_suffix A string indicating the specific endpoint ('pdf', 'cdf', 'qf', or 'samples')
-#' @return Vector of function values or random samples
-#' @export
-query_distribution <- function(value, api_settings, family, arguments, endpoint_suffix) {
-  # Format the body for the POST request
-  body <- list(
-    family = list(requested = family),
-    arguments = arguments
-  )
+#' @param slug The URL slug for an existing distribution.
+#' @param endpoint_suffix The type of distribution function (pdf, cdf, qf, samples).
+#' @param value The values to pass in the query (size for samples, x for pdf/cdf, p for qf).
+#' @return A string representing the constructed endpoint.
+construct_endpoint <- function(slug, endpoint_suffix, value) {
+  # Determine the query parameter based on the endpoint suffix
+  query_param <- switch(endpoint_suffix,
+                        "pdf" = "x",
+                        "cdf" = "x",
+                        "qf" = "p",
+                        "samples" = "size",
+                        stop("Invalid endpoint_suffix provided"))
   
-  # Create the distribution
+  # Construct the endpoint URL with the appropriate query string
+  if (endpoint_suffix == "samples") {
+    # For samples, value represents the size directly, no need to collapse
+    sprintf("%s/%s/?%s=%d", slug, endpoint_suffix, query_param, value)
+  } else {
+    # For other types, value is a vector that needs to be collapsed into a comma-separated string
+    sprintf("%s/%s/?%s=%s", slug, endpoint_suffix, query_param, paste(value, collapse = ","))
+  }
+}
+
+
+#' Create a new distribution and query it
+#'
+#' @param api_settings List containing API settings
+#' @param family The distribution family
+#' @param arguments The distribution arguments
+#' @param value The query values
+#' @param endpoint_suffix The distribution function type
+#' @return Vector of function values
+create_and_query_distribution <- function(api_settings, family, arguments, value, endpoint_suffix) {
+  body <- list(family = list(requested = family), arguments = arguments)
   create_response <- make_post_request(api_settings, "/1d/dists/", body)
   dist_id <- create_response$id
-  
-  # Format the query parameter
-  value_query <- if (endpoint_suffix == "samples") {
-    sprintf("size=%d", value)
-  } else {
-    sprintf("%s=%s", if (endpoint_suffix == "qf") "p" else "x", paste(value, collapse = ","))
-  }
-  endpoint <- sprintf("/1d/dists/%s/%s/?%s", dist_id, endpoint_suffix, value_query)
-  
-  # Make the GET request to query the function
+  query_distribution(api_settings, sprintf("/1d/dists/%s", dist_id), value, endpoint_suffix)
+}
+
+#' Query an existing distribution
+#'
+#' @param api_settings List containing API settings
+#' @param slug The URL slug for an existing distribution
+#' @param value The query values
+#' @param endpoint_suffix The distribution function type
+#' @return Vector of function values
+query_distribution <- function(api_settings, slug, value, endpoint_suffix) {
+  endpoint <- construct_endpoint(slug, endpoint_suffix, value)
   response <- make_get_request(api_settings, endpoint)
-  
   # Extract the values based on the endpoint type
   if (endpoint_suffix == "pdf") {
-    values <- vapply(response, function(item) item$density, numeric(1))
+    vapply(response, function(item) item$density, numeric(1))
   } else if (endpoint_suffix == "cdf") {
-    values <- vapply(response, function(item) item$p, numeric(1))
+    vapply(response, function(item) item$p, numeric(1))
   } else if (endpoint_suffix == "qf") {
-    values <- vapply(response, function(item) item$x, numeric(1))
+    vapply(response, function(item) item$x, numeric(1))
   } else if (endpoint_suffix == "samples") {
-    # Directly return samples
-    values <- unlist(response$samples)
+    unlist(response$samples)
   }
-  
-  values
+}
+
+#' Density of a Distribution
+#'
+#' This function queries the density of a specified distribution at given points.
+#' @param x Vector of points at which to evaluate the density.
+#' @param api_settings List containing API settings.
+#' @param family A string representing the requested distribution family (optional if slug is provided).
+#' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
+#' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @return Vector of density values.
+#' @export
+dmakedist <- function(x, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+  validate_arguments(slug, family, arguments)
+  if (!is.null(slug)) {
+    query_distribution(api_settings, slug, x, "pdf")
+  } else {
+    create_and_query_distribution(api_settings, family, arguments, x, "pdf")
+  }
+}
+
+#' Cumulative Distribution Function
+#'
+#' This function queries the cumulative distribution function of a specified distribution at given points.
+#' @param x Vector of points at which to evaluate the CDF.
+#' @param api_settings List containing API settings.
+#' @param family A string representing the requested distribution family (optional if slug is provided).
+#' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
+#' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @return Vector of CDF values.
+#' @export
+pmakedist <- function(x, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+  validate_arguments(slug, family, arguments)
+  if (!is.null(slug)) {
+    query_distribution(api_settings, slug, x, "cdf")
+  } else {
+    create_and_query_distribution(api_settings, family, arguments, x, "cdf")
+  }
+}
+
+#' Quantile Function
+#'
+#' This function queries the quantile function of a specified distribution for given probabilities.
+#' @param p Vector of probabilities at which to evaluate the quantile function.
+#' @param api_settings List containing API settings.
+#' @param family A string representing the requested distribution family (optional if slug is provided).
+#' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
+#' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @return Vector of quantile values.
+#' @export
+qmakedist <- function(p, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+  validate_arguments(slug, family, arguments)
+  if (!is.null(slug)) {
+    query_distribution(api_settings, slug, p, "qf")
+  } else {
+    create_and_query_distribution(api_settings, family, arguments, p, "qf")
+  }
+}
+
+#' Random Sampling
+#'
+#' This function queries random samples from a specified distribution.
+#' @param size Integer specifying the number of samples to retrieve.
+#' @param api_settings List containing API settings.
+#' @param family A string representing the requested distribution family (optional if slug is provided).
+#' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
+#' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @return Vector of random samples.
+#' @export
+rmakedist <- function(size, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+  validate_arguments(slug, family, arguments)
+  if (!is.null(slug)) {
+    query_distribution(api_settings, slug, size, "samples")
+  } else {
+    create_and_query_distribution(api_settings, family, arguments, size, "samples")
+  }
 }

@@ -4,10 +4,10 @@
 \alias{initialize_api}
 \title{Initialize API settings}
 \usage{
-initialize_api(token, version = "v0")
+initialize_api(token = NULL, version = "v0")
 }
 \arguments{
-\item{token}{Your API token as a string.}
+\item{token}{Your API token as a string (optional).}
 
 \item{version}{API version, default is "v0".}
 }
@@ -15,5 +15,6 @@ initialize_api(token, version = "v0")
 A list containing API settings.
 }
 \description{
-This function initializes the API configuration and settings.
+This function initializes the API configuration and settings. If a token is provided,
+it will be included in all API requests for authorization.
 }

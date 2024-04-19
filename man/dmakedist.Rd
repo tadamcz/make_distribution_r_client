@@ -2,22 +2,24 @@
 % Please edit documentation in R/api_client.R
 \name{dmakedist}
 \alias{dmakedist}
-\title{Query the density of a distribution}
+\title{Density of a Distribution}
 \usage{
-dmakedist(x, api_settings, family, arguments)
+dmakedist(x, family = NULL, arguments = NULL, path = NULL, api_settings = NULL)
 }
 \arguments{
-\item{x}{Vector of points at which to evaluate the density}
+\item{x}{Vector of points at which to evaluate the density.}
 
-\item{api_settings}{List containing API settings}
+\item{family}{A string representing the requested distribution family (optional if path is provided).}
 
-\item{family}{A string representing the requested distribution family}
+\item{arguments}{A list containing the arguments specific to the distribution (optional if path is provided).}
 
-\item{arguments}{A list containing the arguments specific to the distribution}
+\item{path}{A string representing the URL path of an existing distribution (optional if family and arguments are provided).}
+
+\item{api_settings}{List containing API settings (optional).}
 }
 \value{
-Vector of density values
+Vector of density values.
 }
 \description{
-Query the density of a distribution
+This function queries the density of a specified distribution at given points.
 }

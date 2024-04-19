@@ -2,24 +2,22 @@
 % Please edit documentation in R/api_client.R
 \name{query_distribution}
 \alias{query_distribution}
-\title{Create and query a distribution}
+\title{Query an existing distribution}
 \usage{
-query_distribution(value, api_settings, family, arguments, endpoint_suffix)
+query_distribution(api_settings, path, value, endpoint_suffix)
 }
 \arguments{
-\item{value}{Single value specifying the size for samples or vector of x values or probabilities}
-
 \item{api_settings}{List containing API settings}
 
-\item{family}{A string representing the requested distribution family}
+\item{path}{The URL path for an existing distribution}
 
-\item{arguments}{A list containing the arguments specific to the distribution}
+\item{value}{The query values}
 
-\item{endpoint_suffix}{A string indicating the specific endpoint ('pdf', 'cdf', 'qf', or 'samples')}
+\item{endpoint_suffix}{The distribution function type}
 }
 \value{
-Vector of function values or random samples
+Vector of function values
 }
 \description{
-Create and query a distribution
+Query an existing distribution
 }

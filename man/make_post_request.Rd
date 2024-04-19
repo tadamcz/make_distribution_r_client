@@ -17,5 +17,6 @@ make_post_request(api_settings, endpoint, body)
 Parsed JSON response
 }
 \description{
-Make an HTTP POST request
+This function performs an HTTP POST request to a specified endpoint with the given body.
+If a token is provided in the API settings, it will include an Authorization header.
 }

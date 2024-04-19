@@ -2,22 +2,24 @@
 % Please edit documentation in R/api_client.R
 \name{pmakedist}
 \alias{pmakedist}
-\title{Query the cumulative distribution function of a distribution}
+\title{Cumulative Distribution Function}
 \usage{
-pmakedist(x, api_settings, family, arguments)
+pmakedist(x, family = NULL, arguments = NULL, path = NULL, api_settings = NULL)
 }
 \arguments{
-\item{x}{Vector of points at which to evaluate the CDF}
+\item{x}{Vector of points at which to evaluate the CDF.}
 
-\item{api_settings}{List containing API settings}
+\item{family}{A string representing the requested distribution family (optional if path is provided).}
 
-\item{family}{A string representing the requested distribution family}
+\item{arguments}{A list containing the arguments specific to the distribution (optional if path is provided).}
 
-\item{arguments}{A list containing the arguments specific to the distribution}
+\item{path}{A string representing the URL path of an existing distribution (optional if family and arguments are provided).}
+
+\item{api_settings}{List containing API settings (optional).}
 }
 \value{
-Vector of CDF values
+Vector of CDF values.
 }
 \description{
-Query the cumulative distribution function of a distribution
+This function queries the cumulative distribution function of a specified distribution at given points.
 }

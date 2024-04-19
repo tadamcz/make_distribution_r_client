@@ -4,10 +4,10 @@
 \alias{make_get_request}
 \title{Make an HTTP GET request}
 \usage{
-make_get_request(api_settings, endpoint)
+make_get_request(api_settings = NULL, endpoint)
 }
 \arguments{
-\item{api_settings}{List containing base URL and token}
+\item{api_settings}{List containing base URL and token (optional)}
 
 \item{endpoint}{API endpoint for the GET request}
 }
@@ -15,5 +15,6 @@ make_get_request(api_settings, endpoint)
 Parsed JSON response
 }
 \description{
-Make an HTTP GET request
+This function performs an HTTP GET request to a specified endpoint. If a token is provided in the API settings,
+it will include an Authorization header.
 }

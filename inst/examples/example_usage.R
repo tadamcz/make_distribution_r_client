@@ -48,3 +48,10 @@ sample_size <- 16
 samples <- rmakedist(sample_size, api_settings, distribution_family, arguments)
 print("samples:")
 print(samples)
+
+# Or, query an existing distribution object
+# by passing `slug` instead of `family` and `arguments
+distribution_slug <- "/1d/dists/odist_2UjledFsyZHE608XAeKYkw"
+densities <- dmakedist(x_values, api_settings, slug = distribution_slug)
+print("densities:")
+print(densities)

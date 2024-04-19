@@ -8,8 +8,11 @@
 #' @export
 #' 
 initialize_api <- function(token = NULL, version = "v0") {
-  # If token is empty, treat it as NULL
-  # This makes client code's use of `Sys.getenv` simpler
+  # If token is null, try to read it from the default environment variable
+  if (is.null(token)) {
+    token <- Sys.getenv("MAKEDISTRIBUTION_API_TOKEN")
+  }
+  # Coerce empty strings returned by Sys.getenv to NULL
   if (token == "") {
     token <- NULL
   }
@@ -21,11 +24,15 @@ initialize_api <- function(token = NULL, version = "v0") {
 #'
 #' This function performs an HTTP GET request to a specified endpoint. If a token is provided in the API settings,
 #' it will include an Authorization header.
-#' @param api_settings List containing base URL and token
+#' @param api_settings List containing base URL and token (optional)
 #' @param endpoint API endpoint for the GET request
 #' @return Parsed JSON response
-make_get_request <- function(api_settings, endpoint) {
+make_get_request <- function(api_settings = NULL, endpoint) {
+  if (is.null(api_settings)) {
+    api_settings <- initialize_api()
+  }
   url <- paste0(api_settings$base_url, endpoint)
+  message("GET request to: ", url)
   headers <- if (!is.null(api_settings$token)) httr::add_headers(Authorization = paste0("Token ", api_settings$token)) else list()
   response <- httr::GET(url, headers)
   if (httr::http_error(response)) {
@@ -44,7 +51,11 @@ make_get_request <- function(api_settings, endpoint) {
 #' @param body A list containing the body of the POST request
 #' @return Parsed JSON response
 make_post_request <- function(api_settings, endpoint, body) {
+  if (is.null(api_settings)) {
+    api_settings <- initialize_api()
+  }
   url <- paste0(api_settings$base_url, endpoint)
+  message("POST request to: ", url)
   headers <- if (!is.null(api_settings$token)) httr::add_headers(Authorization = paste0("Token ", api_settings$token)) else list()
   response <- httr::POST(url, headers, body = body, encode = "json")
   if (httr::http_error(response)) {
@@ -75,11 +86,11 @@ validate_arguments <- function(slug, family, arguments) {
 #' Get Distribution Details
 #'
 #' This function retrieves the details of a distribution specified by its slug.
-#' @param api_settings List containing API settings.
 #' @param slug The URL slug for the distribution to retrieve.
+#' @param api_settings List containing API settings (optional).
 #' @return Parsed JSON response containing the distribution details.
 #' @export
-get_distribution <- function(api_settings, slug) {
+get_distribution <- function(slug, api_settings = NULL) {
   make_get_request(api_settings, slug)
 }
 
@@ -150,13 +161,13 @@ query_distribution <- function(api_settings, slug, value, endpoint_suffix) {
 #'
 #' This function queries the density of a specified distribution at given points.
 #' @param x Vector of points at which to evaluate the density.
-#' @param api_settings List containing API settings.
 #' @param family A string representing the requested distribution family (optional if slug is provided).
 #' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
 #' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @param api_settings List containing API settings (optional).
 #' @return Vector of density values.
 #' @export
-dmakedist <- function(x, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+dmakedist <- function(x, family = NULL, arguments = NULL, slug = NULL, api_settings = NULL) {
   validate_arguments(slug, family, arguments)
   if (!is.null(slug)) {
     query_distribution(api_settings, slug, x, "pdf")
@@ -169,13 +180,13 @@ dmakedist <- function(x, api_settings, family = NULL, arguments = NULL, slug = N
 #'
 #' This function queries the cumulative distribution function of a specified distribution at given points.
 #' @param x Vector of points at which to evaluate the CDF.
-#' @param api_settings List containing API settings.
 #' @param family A string representing the requested distribution family (optional if slug is provided).
 #' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
 #' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @param api_settings List containing API settings (optional).
 #' @return Vector of CDF values.
 #' @export
-pmakedist <- function(x, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+pmakedist <- function(x, family = NULL, arguments = NULL, slug = NULL, api_settings = NULL) {
   validate_arguments(slug, family, arguments)
   if (!is.null(slug)) {
     query_distribution(api_settings, slug, x, "cdf")
@@ -188,13 +199,13 @@ pmakedist <- function(x, api_settings, family = NULL, arguments = NULL, slug = N
 #'
 #' This function queries the quantile function of a specified distribution for given probabilities.
 #' @param p Vector of probabilities at which to evaluate the quantile function.
-#' @param api_settings List containing API settings.
 #' @param family A string representing the requested distribution family (optional if slug is provided).
 #' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
 #' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @param api_settings List containing API settings.
 #' @return Vector of quantile values.
 #' @export
-qmakedist <- function(p, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+qmakedist <- function(p, family = NULL, arguments = NULL, slug = NULL, api_settings = NULL) {
   validate_arguments(slug, family, arguments)
   if (!is.null(slug)) {
     query_distribution(api_settings, slug, p, "qf")
@@ -207,13 +218,13 @@ qmakedist <- function(p, api_settings, family = NULL, arguments = NULL, slug = N
 #'
 #' This function queries random samples from a specified distribution.
 #' @param size Integer specifying the number of samples to retrieve.
-#' @param api_settings List containing API settings.
 #' @param family A string representing the requested distribution family (optional if slug is provided).
 #' @param arguments A list containing the arguments specific to the distribution (optional if slug is provided).
 #' @param slug A string representing the URL slug of an existing distribution (optional if family and arguments are provided).
+#' @param api_settings List containing API settings.
 #' @return Vector of random samples.
 #' @export
-rmakedist <- function(size, api_settings, family = NULL, arguments = NULL, slug = NULL) {
+rmakedist <- function(size, family = NULL, arguments = NULL, slug = NULL, api_settings = NULL) {
   validate_arguments(slug, family, arguments)
   if (!is.null(slug)) {
     query_distribution(api_settings, slug, size, "samples")

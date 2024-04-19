@@ -44,14 +44,14 @@ print("samples:")
 print(samples)
 
 # Or, query an existing distribution object
-# by passing `slug` instead of `family` and `arguments
-distribution_slug <- "/1d/dists/odist_2UjledFsyZHE608XAeKYkw"
-densities <- dmakedist(x_values, slug = distribution_slug)
+# by passing `path` instead of `family` and `arguments
+distribution_path <- "/1d/dists/odist_2UjledFsyZHE608XAeKYkw"
+densities <- dmakedist(x_values, path = distribution_path)
 print("densities:")
 print(densities)
 
 # Get basic information about the distribution
 # e.g. fit status
-distribution_info <- get_distribution(distribution_slug)
+distribution_info <- get_distribution(distribution_path)
 print("distribution_info:")
 print(distribution_info)

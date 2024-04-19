@@ -5,6 +5,8 @@
 #' @param token Your API token as a string (optional).
 #' @param version API version, default is "v0".
 #' @return A list containing API settings.
+#' @export
+#' 
 initialize_api <- function(token = NULL, version = "v0") {
   base_url <- sprintf("https://makedistribution.com/s/api/%s", version)
   list(base_url = base_url, token = token)
@@ -63,6 +65,17 @@ validate_arguments <- function(slug, family, arguments) {
     stop("Both family and arguments must be provided if slug is not.")
   }
   TRUE
+}
+
+#' Get Distribution Details
+#'
+#' This function retrieves the details of a distribution specified by its slug.
+#' @param api_settings List containing API settings.
+#' @param slug The URL slug for the distribution to retrieve.
+#' @return Parsed JSON response containing the distribution details.
+#' @export
+get_distribution <- function(api_settings, slug) {
+  make_get_request(api_settings, slug)
 }
 
 #' Construct the endpoint for the distribution function query

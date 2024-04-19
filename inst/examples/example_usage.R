@@ -4,11 +4,6 @@ library(makedistribution)
 # Retrieve the API token from an environment variable
 api_token <- Sys.getenv("MAKEDISTRIBUTION_API_TOKEN")
 
-# Check if the token is available
-if (api_token == "") {
-  stop("API token not found. Please set the MAKEDISTRIBUTION_API_TOKEN environment variable.")
-}
-
 # Initialize API settings using the API token
 api_settings <- initialize_api(api_token)
 
@@ -55,3 +50,9 @@ distribution_slug <- "/1d/dists/odist_2UjledFsyZHE608XAeKYkw"
 densities <- dmakedist(x_values, api_settings, slug = distribution_slug)
 print("densities:")
 print(densities)
+
+# Get basic information about the distribution
+# e.g. fit status
+distribution_info <- get_distribution(api_settings, distribution_slug)
+print("distribution_info:")
+print(distribution_info)

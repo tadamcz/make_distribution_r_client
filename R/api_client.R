@@ -8,6 +8,11 @@
 #' @export
 #' 
 initialize_api <- function(token = NULL, version = "v0") {
+  # If token is empty, treat it as NULL
+  # This makes client code's use of `Sys.getenv` simpler
+  if (token == "") {
+    token <- NULL
+  }
   base_url <- sprintf("https://makedistribution.com/s/api/%s", version)
   list(base_url = base_url, token = token)
 }
